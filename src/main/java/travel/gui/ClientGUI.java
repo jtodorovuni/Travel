@@ -10,7 +10,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
-import travel.ClientAgent;
+import travel.agent.ClientAgent;
 
 public class ClientGUI extends JFrame{
 	
