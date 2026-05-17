@@ -391,6 +391,7 @@
     <rdfs:domain rdf:resource="#Activity"/>
     <rdfs:range rdf:resource="#Contact"/>
   </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:ID="hasAccomodation"/>
   <owl:ObjectProperty rdf:about="#isOfferedAt">
     <owl:inverseOf rdf:resource="#hasActivity"/>
     <rdfs:domain rdf:resource="#Activity"/>
@@ -430,7 +431,17 @@
   <Town rdf:ID="Coonabarabran"/>
   <RuralArea rdf:ID="CapeYork"/>
   <RuralArea rdf:ID="Woomera"/>
+  <Destination rdf:about="#Las Vegas">
+    <hasActivity rdf:resource="#Drinking"/>
+    <hasActivity rdf:resource="#Lose all money"/>
+    <hasActivity rdf:resource="#Gambling"/>
+    <hasAccomodation rdf:resource="#MGM"/>
+    <hasAccomodation rdf:resource="#New York"/>
+    <hasAccomodation rdf:resource="#Venice"/>
+  </Destination>
   <Capital rdf:ID="Sydney">
+    <hasActivity rdf:resource="#asd"/>
+    <hasAccomodation rdf:resource="#asd"/>
     <hasPart>
       <Beach rdf:ID="CurrawongBeach"/>
     </hasPart>

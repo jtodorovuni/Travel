@@ -20,7 +20,10 @@ import org.apache.jena.util.iterator.ExtendedIterator;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class TravelOntology {
 	private static final String FILE_PATH = "travel.owl";
@@ -35,7 +38,7 @@ public class TravelOntology {
 
 	private void loadOntology() {
 		model = ModelFactory.createOntologyModel(
-				OntModelSpec.OWL_MEM_MICRO_RULE_INF);
+				OntModelSpec.OWL_MEM_RULE_INF);
 		
 		try(InputStream in = new FileInputStream(FILE_PATH)){
 			model.read(in, BASE);
@@ -78,7 +81,10 @@ public class TravelOntology {
 			}else if(s.getPredicate().equals(hasAccomodation)) {
 				d.getAccomodations().add(objName);
 			}			
+			
 		}
+		
+		d.setInferredTypes(getInferredTypes(name));
 		
 		return d;		
 	}
@@ -205,6 +211,48 @@ public class TravelOntology {
 		Resource resource = model.getResource(NS + name);
 		model.remove(ind, prop, resource);
 		saveOntology();		
+	}
+	
+	
+	public List<String> getInferredTypes(String individualName){
+		ArrayList<String> result = new ArrayList<String>();
+		Individual ind = model.getIndividual(NS + individualName);
+		
+		if(ind == null) {
+			return result;
+		}		
+		
+		ExtendedIterator<Resource> ei = ind.listRDFTypes(false);
+		
+		while(ei.hasNext()) {
+			Resource r = ei.next();
+			
+			if(r.getURI() != null && r.getURI().startsWith(NS)) {
+				result.add(localName(r));
+			}
+		}
+		
+		return result;
+	}
+	
+	public List<String> findDestinationByClass(String className){
+		
+		List<String> result = new ArrayList<>();
+		OntClass cls = model.getOntClass(NS + className);
+		
+		if(cls == null)
+			return result;
+		
+		ExtendedIterator<? extends OntResource> ei = 
+				cls.listInstances();
+		
+		while(ei.hasNext()) {
+			OntResource r = ei.next();
+			
+			if(r.getURI() != null)
+				result.add(localName(r));
+		}		
+		return result;
 	}
 	
 	

@@ -95,7 +95,7 @@ public class ClientAgent extends Agent{
 							Destination result = mapper.readValue(
 									reply.getContent(), 
 									Destination.class);
-							gui.showResult(result.toString());
+							gui.showResult(result.toPrettyString());
 													
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
