@@ -1,8 +1,11 @@
 package travel;
 
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 
+import org.apache.jena.util.ResourceUtils;
 import org.apache.jena.ontology.Individual;
+import org.apache.jena.ontology.ObjectProperty;
 import org.apache.jena.ontology.OntClass;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntModelSpec;
@@ -15,6 +18,7 @@ import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.util.iterator.ExtendedIterator;
 
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -113,5 +117,95 @@ public class TravelOntology {
 			return r.getURI();
 		}		
 	}
+	
+	private void saveOntology() {
+		try(OutputStream out = new FileOutputStream(FILE_PATH)){
+			
+			model.write(out, "RDF/XML-ABBREV", BASE);
+		}catch(Exception ex) {
+			System.out.println(ex.getMessage());
+		}
+	}
+	
+	public void addDestination(String name) {
+		OntClass cls = model.getOntClass(NS + "Destination");
+		
+		if(cls == null) {
+			System.out.println("Class destination not found!");
+			return;
+		}
+		
+		if(model.getIndividual(NS + name) != null) {
+			System.out.println("The destination exists!");
+			return;
+		}
+		
+		model.createIndividual(NS + name, cls);
+		saveOntology();
+	}
+	
+	public void deleteDestination(String name) {
+		Individual ind = model.getIndividual(NS + name);
+		
+		if(ind == null) {
+			System.out.println("Destination not found!");
+			return;
+		}
+		
+		model.removeAll(ind,null,null);
+		model.removeAll(null,null,ind);
+		
+		saveOntology();		
+	}
+	
+	public void renameDestination(String oldName, String newName) {
+		Individual ind = model.getIndividual(NS + oldName);
+		
+		if(ind == null) {
+			System.out.println("Destination not found!");
+			return;
+		}
+		
+		if(model.getIndividual(NS + newName) != null) {
+			System.out.println("We have destination with that name!");
+			return;
+		}
+		
+		ResourceUtils.renameResource(ind, NS + newName);
+		saveOntology();		
+	}
+	
+	public void addPropertyToDestination(String destinationName
+			, String name, String propName) {
+		
+		Individual ind = model.getIndividual(NS + destinationName);
+		
+		if(ind == null) {
+			return;
+		}
+		
+		ObjectProperty prop = model.getObjectProperty(NS + propName);
+		
+		if(prop == null) {
+			prop = model.createObjectProperty(NS + propName);
+		}
+		
+		Resource value = model.getResource(NS + name);
+		ind.addProperty(prop, value);
+		
+		saveOntology();		
+	}
+	
+	public void removePropertyFromDestination(String destName,
+				String name, String propName) {
+		
+		Resource ind = model.getResource(NS + destName);
+		Property prop = model.getProperty(NS + propName);
+		
+		Resource resource = model.getResource(NS + name);
+		model.remove(ind, prop, resource);
+		saveOntology();		
+	}
+	
 	
 }
